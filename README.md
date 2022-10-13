@@ -28,12 +28,18 @@ end
 
 job = Job.new
 
-AASMDiagram::Diagram.new(job.aasm, 'docs/job.png')
+AASMDiagram::Diagram.new(job.aasm, 'docs/job.md')
 ```
 
 Generates the following diagram:
 
-![Diagram of Job state machine](docs/job.png)
+```mermaid
+flowchart LR;
+    sleeping -->|run|running;
+    running -->|clean|cleaning;
+    running -->|sleep|sleeping;
+    cleaning -->|sleep|sleeping;
+```
 
 ## Installation
 
@@ -43,26 +49,26 @@ Generates the following diagram:
 ## Integration
 
 The gem exposes the `generate` Rake task, that can be used to generate the diagrams of state machines into
-PNG images. The `generate` task accepts two parameters:
+Mermaid js flowcharts. The `generate` task accepts two parameters:
 
 - the name of the model, in underscored format, will be CamelCased by the task
 - the name of the state machine, for models with multiple AASMs; this argument is optional
 
-The task will output the PNG image by default to the `/tmp` folder; but can be configured via the
+The task will output the Mermaid Markdown by default to the `/tmp` folder; but can be configured via the
 `AASM_DIAGRAM_OUTPUT_DIR` environment variable to write the files to another folder.
 
-The filenames are generated based on the parameters as follows `model_name-state_machine_name.png`.
+The filenames are generated based on the parameters as follows `model_name-state_machine_name.md`.
 If no state machine name is provided, the task will use `default` for the file name.
 
 ```sh
 # for the Order model and the :dropoff state machine
-rake aasm-diagram:generate[order,dropoff] # -> tmp/order-dropoff.png
+rake aasm-diagram:generate[order,dropoff] # -> tmp/order-dropoff.md
 
 # for the Invoice model and the "default" state machine
-rake aasm-diagram:generate[invoice] # -> tmp/invoice-default.png
+rake aasm-diagram:generate[invoice] # -> tmp/invoice-default.md
 
 # with custom output directory
-AASM_DIAGRAM_OUTPUT_DIR=docs rake aasm-diagram:generate[invoice] # -> docs/invoice-default.png
+AASM_DIAGRAM_OUTPUT_DIR=docs rake aasm-diagram:generate[invoice] # -> docs/invoice-default.md
 ```
 
 ### Rails
@@ -131,10 +137,16 @@ class Cleaner
 end
 
 cleaner = Cleaner.new
-AASMDiagram::Diagram.new(job.aasm, '../docs/guard-cleaner.png')
+AASMDiagram::Diagram.new(job.aasm, 'docs/guard-cleaner.md')
 ```
 
-![Diagram of Cleaner state machine](docs/guard-cleaner.png)
+```mermaid
+flowchart LR;
+    sleeping -->|run|running;
+    running -->|clean|cleaning;
+    running -->|sleep|sleeping;
+    cleaning -->|sleep|sleeping;
+```
 
 ### Multiple state machines per class
 
@@ -171,14 +183,26 @@ class SimpleMultipleExample
 end
 
 simple = SimpleMultipleExample.new
-AASMDiagram::Diagram.new(simple.aasm(:move), 'docs/multiple-state-machines-1.png')
-AASMDiagram::Diagram.new(simple.aasm(:work), 'docs/multiple-state-machines-2.png')
+AASMDiagram::Diagram.new(simple.aasm(:move), 'docs/multiple-state-machines-1.md')
+AASMDiagram::Diagram.new(simple.aasm(:work), 'docs/multiple-state-machines-2.md')
 ```
 
-Generates two images:
+Generates two graphs:
 
-![Diagram of state machine 1](docs/multiple-state-machines-1.png)
-![Diagram of state machine 2](docs/multiple-state-machines-2.png)
+```mermaid
+flowchart LR;
+    standing -->|walk|walking;
+    standing -->|run|running;
+    walking -->|run|running;
+    walking -->|hold|standing;
+    running -->|hold|standing;
+```
+
+```mermaid
+flowchart LR;
+    sleeping -->|start|processing;
+    processing -->|stop|sleeping;
+```
 
 ## Notes
 

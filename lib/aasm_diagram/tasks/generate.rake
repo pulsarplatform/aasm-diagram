@@ -2,6 +2,7 @@ namespace :'aasm-diagram' do
   desc 'Generate AASM diagram for the given model and (optionally) state machine'
   task :generate, [:model, :smn] => :environment do |_task, args|
     puts 'Missing `model` argument.' unless args[:model].present?
+    model = args[:model]
     model_klass = args[:model].camelize.safe_constantize
     puts 'Invalid `model` argument.' unless model_klass
 
@@ -10,7 +11,7 @@ namespace :'aasm-diagram' do
     model_instance = model_klass.new
 
     output_dir = ENV.fetch('AASM_DIAGRAM_OUTPUT_DIR') { './tmp' }
-    output = File.join([output_dir, "#{args[:model]}-#{args[:smn] || 'default'}.png"])
+    output = File.join([output_dir, "#{model}-#{smn || 'default'}.txt"])
 
     AASMDiagram::Diagram.new(
       smn && model_instance.aasm(smn) || model_instance.aasm,

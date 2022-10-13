@@ -1,9 +1,6 @@
 module AASMDiagram
-  #
-  # Save a diagram of a single AASM state machine to an image
-  #
   class Diagram
-    def initialize(aasm_instance, filename, type=:png)
+    def initialize(aasm_instance, filename, type=:LR)
       @aasm_instance = aasm_instance
       @type = type
       draw
@@ -11,30 +8,44 @@ module AASMDiagram
     end
 
     def draw
-      @graphviz = GraphViz.new(:G, type: :digraph)
+      @graph = {}
       draw_nodes
       draw_edges
     end
 
     def draw_nodes
       state_names.map do |state_name|
-        @graphviz.add_nodes(state_name.to_s)
+        @graph[state_name.to_s] = []
       end
     end
 
     def draw_edges
       events.each do |event|
         event.transitions.each do |transition|
-          from = @graphviz.get_node(transition.from.to_s)
-          to = @graphviz.get_node(transition.to.to_s)
+          from = transition.from.to_s
+          to = transition.to.to_s
           label = event.name.to_s
-          @graphviz.add_edges(from, to, label: label)  unless from.nil?
+          @graph[from] << { edge: to, label: label } unless from.nil?
         end
       end
     end
 
     def save(filename)
-      @graphviz.output(@type => filename)
+      File.open(filename, 'w') do |f|
+        f.puts "flowchart #{@type};"
+        @graph.each_entry do |from, connections|
+          if connections.empty?
+            f.puts "    #{from};"
+            next
+          end
+
+          connections.each do |connection|
+            edge, label = connection.values_at(:edge, :label)
+
+            f.puts "    #{from} -->|#{label}|#{edge};"
+          end
+        end
+      end
     end
 
     private

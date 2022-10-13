@@ -12,7 +12,7 @@ Gem::Specification.new do |spec|
   spec.email         = ['code@kate.io']
 
   spec.summary       = 'Automatically generate diagrams of AASM state machines.'
-  spec.homepage      = 'https://github.com/katee/aasm-diagram'
+  spec.homepage      = 'https://github.com/pulsarplatform/aasm-diagram'
   spec.license       = 'MIT'
 
   spec.files         = `git ls-files -z`.split("\x0").reject do |f|
@@ -23,9 +23,8 @@ Gem::Specification.new do |spec|
   spec.require_paths = ['lib']
 
   spec.add_runtime_dependency 'aasm', ['>= 4.12', '~> 5.0']
-  spec.add_runtime_dependency 'ruby-graphviz', '~> 1.2'
 
-  spec.add_development_dependency 'bundler', '~> 1.14'
+  spec.add_development_dependency 'bundler', '>= 2.0'
   spec.add_development_dependency 'rake', '>= 12.3.3'
   spec.add_development_dependency 'rspec', '~> 3.0'
 end
