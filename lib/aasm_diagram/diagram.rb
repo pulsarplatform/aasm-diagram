@@ -3,23 +3,24 @@ module AASMDiagram
     def initialize(aasm_instance, filename, type=:LR)
       @aasm_instance = aasm_instance
       @type = type
-      draw
+      
+      init_graph
       save(filename)
     end
 
-    def draw
+    def init_graph
       @graph = {}
-      draw_nodes
-      draw_edges
+      collect_nodes
+      collect_edges
     end
 
-    def draw_nodes
+    def collect_nodes
       state_names.map do |state_name|
         @graph[state_name.to_s] = []
       end
     end
 
-    def draw_edges
+    def collect_edges
       events.each do |event|
         event.transitions.each do |transition|
           from = transition.from.to_s
@@ -29,21 +30,35 @@ module AASMDiagram
         end
       end
     end
+    
+    def raw
+      result = []
+      result << "flowchart #{@type}"
+      
+      @graph.each_entry do |from, connections|
+        if connections.empty?
+          result << from
+          next
+        end
+
+        connections.each do |connection|
+          edge, label = connection.values_at(:edge, :label)
+
+          result << "#{from} -->|#{label}|#{edge}"
+        end
+      end
+      
+      result
+    end
+    
+    def to_s
+      draw.join(';')
+    end
 
     def save(filename)
       File.open(filename, 'w') do |f|
-        f.puts "flowchart #{@type};"
-        @graph.each_entry do |from, connections|
-          if connections.empty?
-            f.puts "    #{from};"
-            next
-          end
-
-          connections.each do |connection|
-            edge, label = connection.values_at(:edge, :label)
-
-            f.puts "    #{from} -->|#{label}|#{edge};"
-          end
+        draw.each do |line|
+          f.puts "#{line};"
         end
       end
     end
