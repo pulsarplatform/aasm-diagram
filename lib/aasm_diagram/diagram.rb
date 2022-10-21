@@ -52,12 +52,12 @@ module AASMDiagram
     end
     
     def to_s
-      draw.join(';')
+      raw.join(';')
     end
 
     def save(filename)
       File.open(filename, 'w') do |f|
-        draw.each do |line|
+        raw.each do |line|
           f.puts "#{line};"
         end
       end
