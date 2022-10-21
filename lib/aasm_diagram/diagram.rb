@@ -1,11 +1,11 @@
 module AASMDiagram
   class Diagram
-    def initialize(aasm_instance, filename, type=:LR)
+    def initialize(aasm_instance, filename=nil, type=:LR)
       @aasm_instance = aasm_instance
       @type = type
       
       init_graph
-      save(filename)
+      save(filename) if filename
     end
 
     def init_graph
